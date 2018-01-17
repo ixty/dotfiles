@@ -1,0 +1,68 @@
+# ========================================================== #
+# colors
+# ========================================================== #
+C_RST="\[\017\]\[\033[0m\]"
+C_GRY="\[\033[1;30m\]"
+C_RED="\[\033[31m\]"
+C_GRN="\[\033[32m\]"
+C_YLW="\[\033[33m\]"
+C_BLU="\[\033[34m\]"
+C_MAG="\[\033[35m\]"
+C_CYN="\[\033[36m\]"
+C_WHT="\[\033[37m\]"
+
+
+# ========================================================== #
+# get a color based on hostname + username
+# ========================================================== #
+PCOLS=($C_BLU $C_RED $C_CYN $C_YLW $C_MAG $C_GRN $C_WHT)
+PCOLH=$(echo $USER@$(hostname) | sha1sum | cut -d" " -f1)
+PCOLI=$(expr $((16#$PCOLH)) % 7)
+C_COL=${PCOLS[$PCOLI]}
+
+
+# ========================================================== #
+# my prompt - color based on user/host - errno
+# ========================================================== #
+C_POK="${C_WHT}#${C_WHT}"
+C_PNO="${C_RED}#${C_WHT}"
+C_PRM="if [ \$? = 0 ]; then echo \"${C_POK}\"; else echo \"${C_PNO}\"; fi"
+PS1="${C_RST}${C_COL}<${C_WHT}\u${C_COL}~${C_WHT}\H${C_COL}> ${C_GRN}\w \`${C_PRM}\` "
+
+
+# ========================================================== #
+# aliases
+# ========================================================== #
+export lopts='--color=auto'
+eval "`dircolors`"
+alias ls='ls $lopts'
+alias ll='ls $lopts -l'
+alias lla='ls $lopts -la'
+alias lh='ls $lopts -lh'
+alias la='ls $lopts -la'
+alias grep='grep --color'
+alias less='less -r'
+alias ggg='gdb -ex=r --args'
+alias hexsort="tr [a-f] [A-F] | awk ' { printf "%80s\n",$1 } ' | sort | awk ' { print $1 } ' "
+alias webshare='python -m SimpleHTTPServer 8080'
+alias splitwords="tr -s '[[:punct:][:space:]]' '\n'"
+alias tolower="tr '[:upper:]' '[:lower:]'"
+
+# ========================================================== #
+# env
+# ========================================================== #
+export EDITOR=nano
+export SHELL=bash
+
+# ========================================================== #
+# pager
+# ========================================================== #
+export PAGER='less -R'
+export LESS_TERMCAP_mb=$'\e[01;31m'                 # begin blinking
+export LESS_TERMCAP_md=$'\e[01;38;5;12m'            # begin bold
+export LESS_TERMCAP_me=$'\e[0m'                     # end mode
+export LESS_TERMCAP_so=$'\e[30m\e[42m'              # begin standout-mode - info box
+export LESS_TERMCAP_se=$'\e[0m'                     # end standout-mode
+export LESS_TERMCAP_us=$'\e[04;38;5;6m'             # begin underline
+export LESS_TERMCAP_ue=$'\e[0m'                     # end underline
+
