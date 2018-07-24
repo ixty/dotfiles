@@ -52,6 +52,7 @@ alias webshare='python -m SimpleHTTPServer 8080'
 alias splitwords="tr -s '[[:punct:][:space:]]' '\n'"
 alias tolower="tr '[:upper:]' '[:lower:]'"
 alias ownmbh="chown -R mbh: ~mbh"
+alias goops="git reset HEAD^"
 
 alias monon='ifconfig wlan0 down; iwconfig wlan0 mode monitor; ifconfig wlan0 up'
 alias monoff='ifconfig wlan0 down; iwconfig wlan0 mode managed; ifconfig wlan0 up'
@@ -61,6 +62,10 @@ alias paraget='xargs -n 1 -P 8 wget -q'
 alias json_pp='python -m json.tool'
 alias vba='source venv/bin/activate'
 alias pdfcompress='convert -density 144 -compress jpeg -quality 30'
+alias bninja='~mbh/binaryninja/binaryninja'
+alias reset='stty intr ^c; reset'
+
+# pandoc in.md -s -o out.pdf -V geometry:margin=1in
 
 wmon() {
     ifconfig $1 down
@@ -69,20 +74,34 @@ wmon() {
     iwconfig $1 channel 1
 }
 
+pidmem() {
+    if [ -z "$3" ]; then
+        export l=0x1000
+    else
+        export l=$3
+    fi
+
+    dd if=/proc/$1/mem skip=$(($2)) count=$(($l)) bs=1 2> /dev/null | hd
+}
+
 # ========================================================== #
 # env
 # ========================================================== #
 shopt -s histappend
 tabs 4
-
+HISTFILESIZE=1000000
+HISTSIZE=1000000
+HISTCONTROL=ignoreboth
+HISTIGNORE='ls:bg:fg:history:cd'
+# PROMPT_COMMAND='history -a'
 
 # ========================================================== #
 # env
 # ========================================================== #
 export EDITOR=nano
 export SHELL=bash
-export CFLAGS="-fdiagnostics-color=auto -Wno-missing-field-initializers -D_NO_ACQ_SECURITY"
-export CXXFLAGS="-fdiagnostics-color=auto -Wno-missing-field-initializers -D_NO_ACQ_SECURITY"
+export CFLAGS="-fdiagnostics-color=auto -Wno-missing-field-initializers"
+export CXXFLAGS="-fdiagnostics-color=auto -Wno-missing-field-initializers"
 
 
 # ========================================================== #
@@ -108,8 +127,6 @@ export LESS_TERMCAP_ue=$'\e[0m'                     # end underline
 # ssh -o PreferredAuthentications=password -o PubkeyAuthentication=no
 # socat - UDP-DATAGRAM:255.255.255.255:24000,broadcast
 # route add -net 172.16.0.0 netmask 255.240.0.0 gw 172.23.101.254 dev
-# alias tvid='mpv --vo tct'
-# alias systemd_unfuck="mount -o remount,ro / && fsck -f -y /dev/mapper/... && fsck -f -y /boot"
 
 
 # ========================================================== #
@@ -125,8 +142,7 @@ function start_agent {
 # ========================================================== #
 # add ssh keys
 # ========================================================== #
-#    ssh-add ~/.ssh/id_github
-#    ssh-add ~/.ssh/id_xxx
+    ssh-add ~/.ssh/id_github
 }
 
 if [ -f "${SSH_ENV}" ]; then
@@ -138,4 +154,9 @@ else
      start_agent;
 fi
 
+
+#alias tvid='mpv --vo tct'
+#alias systemd_unfuck="mount -o remount,ro / && fsck -f -y /dev/mapper/... && fsck -f -y /boot"
+
+# tshark -r in.pcap -w out.pcap -R 'http.request.method == "GET" && http.request.uri contains "/rest/api3"'
 
